@@ -127,4 +127,141 @@ var myMap map[int]string
 // 초기화하지 않은 맵을 참조하면 에러가 발생한다.
 myMap = make(map[int]string)
 
+// 맵 선언과 동시에 초기화
+myMap = make(map[int]string){}
+
+// 초기값 설정
+myMap = map[int]string{1: "first", 2: "second", 3: "third"}
+
+// 정의된 맵에 키-값 삽입
+myMap[4] = "fourth"
+
+// 특정 키의 값 찾기
+var x = myMap[4]
+
+// 함수 안에서 특정 키가 맵 안에 존재하는지 확인
+// myMap 안에 5번 키가 없다면 ok = false
+// 존재한다면 ok = true / x = 해당 값
+x, ok := myMap[5]
+
+// 특정 키를 맵에서 삭제
+delete(myMap, 4)
 ```
+
+
+# 구조체
+
+구조체(struct)는 여러 자료형의 집합이다.
+
+```go
+type myStruct struct {
+    intField int
+    stringField string
+    sliceField []int
+}
+
+// 구조체의 초기화
+// 구조체 리터럴(struct literal) 초기화: 값과 키를 열거하는 초기화 방식
+var s = myStruct {
+    intField: 3,
+    stringField: "three",
+    sliceField = []int{1, 2, 3},
+}
+
+// 축약하여 초기화
+var s = myStruct{3, "three", []int{1, 2, 3}}
+
+// 점 표기법(dot notation) 사용하여 초기화
+var s = myStruct{}
+s.intField = 3
+s.stringField = "three"
+s.sliceField = []int{1, 2, 3}
+
+// 구조체 포인터 선언하기
+var sPtr = &myStruct {
+    intField: 3,
+    stringField: "three",
+    sliceField: []int{1, 2, 3},
+}
+
+// 구조체 포인터에 점 표기법을 사용하면 포인터를 역참조하지 않아도 된다.
+var s = &myStruct{}
+s.intField = 3
+s.stringField = "three"
+s.sliceField = []int{1, 2, 3}
+```
+
+이름이 소문자로 시작하는 구조체의 필드는 다른 패키지에서 접근할 수 없다. 구조체나 필드를 다른 패키지에서 접근하고 싶다면 구조체의 필드명의 첫 글자를 대문자로 선언해야 한다.
+
+
+# 메서드
+
+메서드(method)는 타입에 연결하는 함수다.
+
+```go
+// 구조체 정의
+type Person struct {
+    name string
+    age int
+}
+
+// 메서드를 타입에 연결
+// 여기서 (p Person)는 메서드의 리시버(receiver)라고 부른다.
+func (p Person) GetName() string {
+    return p.name
+}
+
+// 메서드 사용하기
+var p = Person {
+    name: "ydhwa",
+    age: 25,
+}
+p.GetName()
+
+// 다른 메서드 작성
+func (p Person) GetAge() int {
+    return p.age
+}
+```
+
+
+# 타입 임베딩
+
+Go 언어에서 상속(inherit)에 가장 가까운 개념은 타입 임베딩(type embedding)이다.
+
+다음 Person 구조체의 모든 필드와 메서드를 포함하는 Student 구조체를 만들어보자.
+
+```go
+type Person struct {
+    name string
+    age int
+}
+func (p Person) GetName() string {
+    return p.name
+}
+func (p Person) GetAge() int {
+    return p.age
+}
+```
+
+```go
+type Student struct {
+    Person
+    studentId int
+}
+func (s Student) GetStudentID() int {
+    return s.studentId
+}
+```
+
+Student 구조체에는 필드명이 없는 Person 타입이 포함되어 있다. Student는 Person 타입의 모든 익스포트된 필드와 메서드를 상속받는다.
+Student 타입에서 Person 타입의 메서드와 필드에 바로 접근할 수 있다는 뜻이다.
+
+```go
+s := Student{}
+// 임베딩된 'Person'의 메서드 호출
+s.GetAge()
+s.GetName()
+```
+
+임베딩된 타입의 익스포트된 메서드와 필드는 부모나 임베딩하는 타입에 속한다.
